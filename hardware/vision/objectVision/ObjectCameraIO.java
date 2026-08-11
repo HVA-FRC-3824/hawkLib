@@ -4,10 +4,10 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.vision.objectVision;
+package frc.shared.hardware.vision.objectVision;
 
 import edu.wpi.first.units.measure.Angle;
-import frc.hawkLib.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
+import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
 
 import java.util.Optional;
 import java.util.Set;

@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.motor.ctre;
+package frc.shared.hardware.motor.ctre;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
@@ -16,8 +16,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.hawkLib.hardware.SimBattery;
-import frc.hawkLib.hardware.motor.MotorConfig;
+import frc.shared.hardware.SimBattery;
+import frc.shared.hardware.motor.MotorConfig;
 
 public class MotorIOSim extends MotorIOTalonFX {
 

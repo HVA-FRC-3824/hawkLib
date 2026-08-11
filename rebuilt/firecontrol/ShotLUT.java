@@ -1,4 +1,4 @@
-package frc.hawkLib.rebuilt.firecontrol;
+package frc.shared.rebuilt.firecontrol;
 
 /*
  * ShotLUT.java - Distance-keyed lookup table for shot parameters

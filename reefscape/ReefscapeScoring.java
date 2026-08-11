@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.reefscape;
+package frc.shared.reefscape;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
@@ -16,8 +16,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.hawkLib.Triple;
-import frc.hawkLib.hardware.vision.poseVision.PoseCameraIO;
+import frc.shared.Triple;
+import frc.shared.hardware.vision.poseVision.PoseCameraIO;
 import frc.o2026.Constants;
 import java.util.HashMap;
 import java.util.List;

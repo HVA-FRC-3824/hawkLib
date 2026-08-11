@@ -1,4 +1,4 @@
-package frc.hawkLib.rebuilt.firecontrol;
+package frc.shared.rebuilt.firecontrol;
 
 /*
  * ProjectileSimulator.java - RK4 projectile physics with drag and Magnus lift

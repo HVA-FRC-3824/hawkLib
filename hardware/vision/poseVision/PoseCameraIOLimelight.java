@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.vision.poseVision;
+package frc.shared.hardware.vision.poseVision;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -12,10 +12,10 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import frc.hawkLib.hardware.vision.VisionConfig;
-import frc.hawkLib.hardware.vision.limelight.LimelightHelpers;
-import frc.hawkLib.hardware.vision.limelight.LimelightHelpers.PoseEstimate;
-import frc.hawkLib.hardware.vision.poseVision.PoseVision.VisionData;
+import frc.shared.hardware.vision.VisionConfig;
+import frc.shared.hardware.vision.limelight.LimelightHelpers;
+import frc.shared.hardware.vision.limelight.LimelightHelpers.PoseEstimate;
+import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import frc.o2026.RobotState;
 import java.util.ArrayList;
 import java.util.List;

@@ -4,10 +4,10 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.vision.poseVision;
+package frc.shared.hardware.vision.poseVision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.hawkLib.hardware.vision.VisionConfig;
+import frc.shared.hardware.vision.VisionConfig;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;
 import org.photonvision.simulation.PhotonCameraSim;

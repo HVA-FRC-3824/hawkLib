@@ -4,13 +4,13 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.motor.ctre;
+package frc.shared.hardware.motor.ctre;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.hawkLib.EnumChooser;
+import frc.shared.EnumChooser;
 
 import java.util.HashMap;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package frc.hawkLib.rebuilt.firecontrol;
+package frc.shared.rebuilt.firecontrol;
 
 /*
  * ShotCalculator.java - Newton-method SOTM fire control with drag compensation

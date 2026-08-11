@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.rebuilt;
+package frc.shared.rebuilt;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import frc.hawkLib.rebuilt.firecontrol.FuelPhysicsSim;
+import frc.shared.rebuilt.firecontrol.FuelPhysicsSim;
 import frc.o2026.Constants;
 
 public class BallSim {

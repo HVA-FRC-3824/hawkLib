@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.vision.poseVision;
+package frc.shared.hardware.vision.poseVision;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
@@ -16,8 +16,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.Timer;
-import frc.hawkLib.hardware.vision.VisionConfig;
-import frc.hawkLib.hardware.vision.poseVision.PoseVision.VisionData;
+import frc.shared.hardware.vision.VisionConfig;
+import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;

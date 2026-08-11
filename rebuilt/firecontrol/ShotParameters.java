@@ -1,4 +1,4 @@
-package frc.hawkLib.rebuilt.firecontrol;
+package frc.shared.rebuilt.firecontrol;
 
 /*
  * ShotParameters.java - Shot parameters (RPM, angle, TOF) for one LUT entry

@@ -1,4 +1,4 @@
-package frc.hawkLib.rebuilt;
+package frc.shared.rebuilt;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;

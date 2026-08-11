@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.motor.rev;
+package frc.shared.hardware.motor.rev;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -25,9 +25,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.hawkLib.hardware.SimBattery;
-import frc.hawkLib.hardware.motor.MotorConfig;
-import frc.hawkLib.hardware.motor.MotorIO;
+import frc.shared.hardware.SimBattery;
+import frc.shared.hardware.motor.MotorConfig;
+import frc.shared.hardware.motor.MotorIO;
 
 import org.littletonrobotics.junction.Logger;
 

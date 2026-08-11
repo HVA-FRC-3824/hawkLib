@@ -4,7 +4,7 @@
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.hawkLib.hardware.TOF;
+package frc.shared.hardware.TOF;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ProximityParamsConfigs;
