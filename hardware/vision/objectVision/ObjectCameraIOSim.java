@@ -21,6 +21,8 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
 public class ObjectCameraIOSim implements ObjectCameraIO {
@@ -28,25 +30,24 @@ public class ObjectCameraIOSim implements ObjectCameraIO {
   private static final Rotation2d CAMERA_HORIZONTAL_FOV = Rotation2d.fromDegrees(75),
       CAMERA_VERTICAL_FOV = Rotation2d.fromDegrees(45);
 
-  private VisionConfig m_config;
+  private final VisionConfig m_config;
 
-  private Distance SeeableDist = Meters.of(5.0);
+  private final SimulatedArena m_arena;
 
-  public ObjectCameraIOSim(VisionConfig config) {
+  public ObjectCameraIOSim(VisionConfig config, SimulatedArena arena) {
 
     m_config = config;
+
+    m_arena = arena;
   }
 
   @Override
   public Set<ObjectTargetData> getObjects() {
     Pose3d robotPose = RobotState.getSimRealPose();
 
-    return RobotState.getSimArena().gamePiecesOnField().stream()
+    return m_arena.gamePiecesOnField().stream()
         .map(GamePieceOnFieldSimulation::getPose3d)
         .map(Pose3d::getTranslation)
-        .filter(
-            translation ->
-                robotPose.getTranslation().getDistance(translation) < SeeableDist.in(Meters))
         .map(
             translation -> {
               // translation is field-relative. Convert to robot-relative:

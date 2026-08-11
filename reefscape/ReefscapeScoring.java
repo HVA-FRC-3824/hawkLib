@@ -8,6 +8,7 @@ package frc.shared.reefscape;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +28,9 @@ import java.util.stream.Stream;
 import lombok.Getter;
 
 public class ReefscapeScoring {
+
+  private static final Distance CoralScoreYOffset = Inches.of(-6.467946);
+  private static final Distance CoralDiameter = Inches.of(4.0);
 
   @Getter private HashMap<Pose3d, Boolean> scoringLocations;
 
@@ -60,8 +64,8 @@ public class ReefscapeScoring {
                   .flatMap(
                       (tagPose) -> {
                         return List.of(
-                                Constants.Superstructure.CoralScoreYOffset,
-                                Constants.Superstructure.CoralScoreYOffset.times(-1))
+                                CoralScoreYOffset,
+                                CoralScoreYOffset.times(-1))
                             .stream()
                             .flatMap(
                                 yOffset -> {
@@ -92,7 +96,7 @@ public class ReefscapeScoring {
                                                         heightAndDepthAndPitch
                                                             .getSecond()
                                                             .plus(
-                                                                Constants.Field.CoralDiameter.times(
+                                                                CoralDiameter.times(
                                                                     2.0)),
                                                         yOffset,
                                                         Rotation2d.kZero));

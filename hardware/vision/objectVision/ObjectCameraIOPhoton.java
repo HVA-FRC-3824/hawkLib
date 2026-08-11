@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
 import frc.o2026.Constants;
@@ -31,9 +32,13 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
 
   private final VisionConfig m_config;
 
-  public ObjectCameraIOPhoton(VisionConfig config) {
+  private final Distance m_targetHeight;
+
+  public ObjectCameraIOPhoton(VisionConfig config, Distance targetHeight) {
 
     m_config = config;
+
+    m_targetHeight = targetHeight;
 
     m_camera = new PhotonCamera(m_config.name());
   }
@@ -54,7 +59,7 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
         double rangeMeters =
             PhotonUtils.calculateDistanceToTargetMeters(
                 m_config.offset().getTranslation().getZ(),
-                Constants.Field.CoralDiameter.in(Meters) / 2.0,
+                m_targetHeight.in(Meters) / 2.0,
                 -m_config.offset().getRotation().getMeasureY().in(Radians),
                 Degrees.of(target.getPitch()).in(Radians));
 
@@ -65,7 +70,7 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
             new Translation3d(
                 rangeMeters * yaw.getCos(),
                 rangeMeters * yaw.getSin(),
-                (Constants.Field.CoralDiameter.in(Meters) / 2.0)
+                (m_targetHeight.in(Meters) / 2.0)
                     - m_config.offset().getTranslation().getZ());
 
         Translation3d robotToTarget =
