@@ -6,22 +6,18 @@
 
 package frc.shared.hardware.vision.objectVision;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
+import frc.o2026.RobotState;
 import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
-import frc.o2026.RobotState;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 

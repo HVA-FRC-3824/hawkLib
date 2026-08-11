@@ -8,7 +8,6 @@ package frc.shared.hardware.vision.objectVision;
 
 import edu.wpi.first.units.measure.Angle;
 import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
-
 import java.util.Optional;
 import java.util.Set;
 

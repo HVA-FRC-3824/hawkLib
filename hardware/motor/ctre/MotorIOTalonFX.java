@@ -29,7 +29,6 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.shared.hardware.motor.MotorConfig;
 import frc.shared.hardware.motor.MotorIO;
-
 import org.littletonrobotics.junction.Logger;
 
 public class MotorIOTalonFX implements MotorIO {

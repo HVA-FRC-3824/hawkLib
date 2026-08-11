@@ -15,7 +15,6 @@ import edu.wpi.first.math.util.Units;
 import frc.o2026.RobotState;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
@@ -24,13 +23,11 @@ public class ReefscapeIntakeUtil {
   public static boolean hasNewCoralFromCollector(SimulatedArena arena) {
     // find all corals
     List<GamePieceOnFieldSimulation> corals = new ArrayList<>();
-    for (GamePieceOnFieldSimulation coral : arena.gamePiecesOnField())
-      corals.add(coral);
+    for (GamePieceOnFieldSimulation coral : arena.gamePiecesOnField()) corals.add(coral);
 
     // choose those close enough to intake
     for (GamePieceOnFieldSimulation coral : corals)
-      if (insideIntakeRange(coral.getPose3d()))
-        return arena.removeGamePiece(coral);
+      if (insideIntakeRange(coral.getPose3d())) return arena.removeGamePiece(coral);
 
     return false;
   }

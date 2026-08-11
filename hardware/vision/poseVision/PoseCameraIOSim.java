@@ -7,9 +7,9 @@
 package frc.shared.hardware.vision.poseVision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.shared.hardware.vision.VisionConfig;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;
+import frc.shared.hardware.vision.VisionConfig;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;

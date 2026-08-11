@@ -17,7 +17,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
-import frc.o2026.Constants;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -70,8 +69,7 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
             new Translation3d(
                 rangeMeters * yaw.getCos(),
                 rangeMeters * yaw.getSin(),
-                (m_targetHeight.in(Meters) / 2.0)
-                    - m_config.offset().getTranslation().getZ());
+                (m_targetHeight.in(Meters) / 2.0) - m_config.offset().getTranslation().getZ());
 
         Translation3d robotToTarget =
             cameraToTarget

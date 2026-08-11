@@ -29,14 +29,20 @@ public class MotorIOFlywheelSim extends MotorIOTalonFX {
   private double m_gearRatio;
 
   public MotorIOFlywheelSim(
-      int id, MotorConfig config, boolean isX60, double moi, int numMotorsInSystem, double gearRatio) {
+      int id,
+      MotorConfig config,
+      boolean isX60,
+      double moi,
+      int numMotorsInSystem,
+      double gearRatio) {
 
     super(id, config);
 
     m_talonFXSim = m_motor.getSimState();
     m_talonFXSim.setMotorType(isX60 ? MotorType.KrakenX60 : MotorType.KrakenX44);
 
-    DCMotor motor = isX60 ? DCMotor.getKrakenX60(numMotorsInSystem) : DCMotor.getKrakenX44(numMotorsInSystem);
+    DCMotor motor =
+        isX60 ? DCMotor.getKrakenX60(numMotorsInSystem) : DCMotor.getKrakenX44(numMotorsInSystem);
 
     m_motorSimModel =
         new FlywheelSim(LinearSystemId.createFlywheelSystem(motor, moi, gearRatio), motor);

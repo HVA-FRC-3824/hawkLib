@@ -26,12 +26,6 @@ public interface MotorIO {
 
   public void config(MotorConfig config);
 
-  public default MotorIO withConfig(MotorConfig config) {
-
-    config(config);
-    return this;
-  }
-
   public int getId();
 
   public void follow(int id, boolean inverted);

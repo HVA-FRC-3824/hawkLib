@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.shared.hardware.SimBattery;
 import frc.shared.hardware.motor.MotorConfig;
 import frc.shared.hardware.motor.MotorIO;
-
 import org.littletonrobotics.junction.Logger;
 
 public final class MotorIOSparkMax implements MotorIO {

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.shared.EnumChooser;
-
 import java.util.HashMap;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;

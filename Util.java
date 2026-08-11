@@ -16,13 +16,17 @@ import frc.robot.lib.BLine.FlippingUtil;
 public class Util {
 
   public static void sendLambda(String name, Runnable runnable) {
-    SmartDashboard.putData(lambdaAsCommand(runnable));
+    SmartDashboard.putData(run(runnable));
   }
 
-  public static Command lambdaAsCommand(Runnable runnable) {
+  public static Command runOnce(Runnable runnable) {
+    return Commands.runOnce(runnable).asProxy();
+  }
+
+  public static Command run(Runnable runnable) {
     return Commands.run(runnable).asProxy();
   }
-  
+
   public static boolean isRed() {
     return DriverStation.getAlliance().orElse(DriverStation.Alliance.Red)
         == DriverStation.Alliance.Red;

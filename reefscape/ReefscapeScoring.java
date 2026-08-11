@@ -10,6 +10,8 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -17,9 +19,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.shared.Triple;
+import frc.shared.Quadruple;
 import frc.shared.hardware.vision.poseVision.PoseCameraIO;
-import frc.o2026.Constants;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,9 @@ public class ReefscapeScoring {
   private static final Distance CoralScoreYOffset = Inches.of(-6.467946);
   private static final Distance CoralDiameter = Inches.of(4.0);
 
-  @Getter private HashMap<Pose3d, Boolean> scoringLocations;
+  // Format: 06-11/17-22 1/2/3/4 L/R
+  // Ex: 082R, 194R
+  private static HashMap<String, Pair<Pose3d, Boolean>> scoringLocations;
 
   private static ReefscapeScoring m_inst = null;
 
@@ -52,56 +57,58 @@ public class ReefscapeScoring {
     scoringLocations = getReefs();
   }
 
-  public HashMap<Pose3d, Boolean> getReefs() {
+  public HashMap<String, Pair<Pose3d, Boolean>> getReefs() {
 
-    HashMap<Pose3d, Boolean> map = new HashMap<>();
+    HashMap<String, Pair<Pose3d, Boolean>> map = new HashMap<>();
     List.of(IntStream.range(6, 12), IntStream.range(17, 23)).stream()
         .map(IntStream::boxed)
         .forEach(
-            (reef) -> {
-              reef.map(PoseCameraIO::getTagPose)
-                  .map(Pose3d::toPose2d)
-                  .flatMap(
+            (reefTag) -> {
+              reefTag.map(tag -> new Pair<Pose2d, Integer>(PoseCameraIO.getTagPose(tag).toPose2d(), tag))
+                  .forEach(
                       (tagPose) -> {
-                        return List.of(
-                                CoralScoreYOffset,
-                                CoralScoreYOffset.times(-1))
+                        List.of(
+                          new Pair<Distance, String>(CoralScoreYOffset, "L"), 
+                          new Pair<Distance, String>(CoralScoreYOffset.times(-1), "R"))
                             .stream()
-                            .flatMap(
+                            .forEach(
                                 yOffset -> {
-                                  return List.of(
+                                  List.of(
                                           // Height, Depth, Pitch
-                                          new Triple<Distance, Distance, Angle>(
+                                          new Quadruple<Distance, Distance, Angle, Integer>(
                                               Centimeters.of(71),
                                               Centimeters.of(-41),
-                                              Degrees.of(35)),
-                                          new Triple<Distance, Distance, Angle>(
+                                              Degrees.of(35),
+                                              2),
+                                          new Quadruple<Distance, Distance, Angle, Integer>(
                                               Centimeters.of(111),
                                               Centimeters.of(-35),
-                                              Degrees.of(35)),
-                                          new Triple<Distance, Distance, Angle>(
+                                              Degrees.of(35),
+                                              3),
+                                          new Quadruple<Distance, Distance, Angle, Integer>(
                                               Centimeters.of(173),
                                               Centimeters.of(-27),
-                                              Degrees.of(90)),
-                                          new Triple<Distance, Distance, Angle>(
+                                              Degrees.of(90),
+                                              4),
+                                          new Quadruple<Distance, Distance, Angle, Integer>(
                                               Centimeters.of(50),
                                               Centimeters.of(-35),
-                                              Degrees.of(-30)))
+                                              Degrees.of(-30),
+                                              1))
                                       .stream()
                                       .map(
                                           heightAndDepthAndPitch -> {
                                             var transformedPose =
-                                                tagPose.plus(
+                                                tagPose.getFirst().plus(
                                                     new Transform2d(
                                                         heightAndDepthAndPitch
                                                             .getSecond()
-                                                            .plus(
-                                                                CoralDiameter.times(
-                                                                    2.0)),
-                                                        yOffset,
+                                                            .plus(CoralDiameter.times(2.0)),
+                                                        yOffset.getFirst(),
                                                         Rotation2d.kZero));
 
-                                            return new Pose3d(
+                                            return new Pair<Pose3d, Integer>(
+                                              new Pose3d(
                                                 new Translation3d(
                                                     transformedPose.getMeasureX(),
                                                     transformedPose.getMeasureY(),
@@ -109,25 +116,35 @@ public class ReefscapeScoring {
                                                 new Rotation3d(
                                                     Degrees.of(0),
                                                     heightAndDepthAndPitch.getThird().unaryMinus(),
-                                                    tagPose.getRotation().getMeasure()));
-                                          });
+                                                    tagPose.getFirst().getRotation().getMeasure())),
+                                              heightAndDepthAndPitch.getFourth());
+                                          })
+                                          .forEach(loc -> 
+                                            map.put(tagPose.getSecond().toString() + loc.getSecond(), 
+                                                  new Pair<Pose3d, Boolean>(loc.getFirst(), false)));
                                 });
-                      })
-                  .forEach(loc -> map.put(loc, false));
+                      });
             });
     return map;
+  }
+
+  public void score(String key) {
+
+    scoringLocations.put(
+      key, 
+      new Pair<Pose3d, Boolean>(
+        scoringLocations.get(key).getFirst(),
+        true));
   }
 
   public List<Pose3d> getCoral() {
 
     var scatteredCoral =
-        scoringLocations.entrySet().stream()
-            .filter(loc -> loc.getValue())
-            .map(
-                (loc) -> {
-                  return loc.getKey();
-                })
-            .toList();
+        scoringLocations.values()
+            .stream()
+            .filter(Pair::getSecond) // filter for locs with coral
+            .map(Pair::getFirst) // get their poses
+            .toList(); // collect
 
     if (m_heldCoral.isPresent()) {
       scatteredCoral =
