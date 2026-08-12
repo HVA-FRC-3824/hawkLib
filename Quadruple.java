@@ -30,7 +30,7 @@ public class Quadruple<A, B, C, D> {
   public C getThird() {
     return third;
   }
-  
+
   public D getFourth() {
     return fourth;
   }

@@ -21,14 +21,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.shared.Quadruple;
 import frc.shared.hardware.vision.poseVision.PoseCameraIO;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import lombok.Getter;
 
 public class ReefscapeScoring {
 
@@ -64,12 +61,15 @@ public class ReefscapeScoring {
         .map(IntStream::boxed)
         .forEach(
             (reefTag) -> {
-              reefTag.map(tag -> new Pair<Pose2d, Integer>(PoseCameraIO.getTagPose(tag).toPose2d(), tag))
+              reefTag
+                  .map(
+                      tag ->
+                          new Pair<Pose2d, Integer>(PoseCameraIO.getTagPose(tag).toPose2d(), tag))
                   .forEach(
                       (tagPose) -> {
                         List.of(
-                          new Pair<Distance, String>(CoralScoreYOffset, "L"), 
-                          new Pair<Distance, String>(CoralScoreYOffset.times(-1), "R"))
+                                new Pair<Distance, String>(CoralScoreYOffset, "L"),
+                                new Pair<Distance, String>(CoralScoreYOffset.times(-1), "R"))
                             .stream()
                             .forEach(
                                 yOffset -> {
@@ -99,29 +99,40 @@ public class ReefscapeScoring {
                                       .map(
                                           heightAndDepthAndPitch -> {
                                             var transformedPose =
-                                                tagPose.getFirst().plus(
-                                                    new Transform2d(
-                                                        heightAndDepthAndPitch
-                                                            .getSecond()
-                                                            .plus(CoralDiameter.times(2.0)),
-                                                        yOffset.getFirst(),
-                                                        Rotation2d.kZero));
+                                                tagPose
+                                                    .getFirst()
+                                                    .plus(
+                                                        new Transform2d(
+                                                            heightAndDepthAndPitch
+                                                                .getSecond()
+                                                                .plus(CoralDiameter.times(2.0)),
+                                                            yOffset.getFirst(),
+                                                            Rotation2d.kZero));
 
-                                            return new Pair<Pose3d, Integer>(
-                                              new Pose3d(
-                                                new Translation3d(
-                                                    transformedPose.getMeasureX(),
-                                                    transformedPose.getMeasureY(),
-                                                    heightAndDepthAndPitch.getFirst()),
-                                                new Rotation3d(
-                                                    Degrees.of(0),
-                                                    heightAndDepthAndPitch.getThird().unaryMinus(),
-                                                    tagPose.getFirst().getRotation().getMeasure())),
-                                              heightAndDepthAndPitch.getFourth());
+                                            return new Pair<Pose3d, String>(
+                                                new Pose3d(
+                                                    new Translation3d(
+                                                        transformedPose.getMeasureX(),
+                                                        transformedPose.getMeasureY(),
+                                                        heightAndDepthAndPitch.getFirst()),
+                                                    new Rotation3d(
+                                                        Degrees.of(0),
+                                                        heightAndDepthAndPitch
+                                                            .getThird()
+                                                            .unaryMinus(),
+                                                        tagPose
+                                                            .getFirst()
+                                                            .getRotation()
+                                                            .getMeasure())),
+                                                heightAndDepthAndPitch.getFourth()
+                                                    + yOffset.getSecond());
                                           })
-                                          .forEach(loc -> 
-                                            map.put(tagPose.getSecond().toString() + loc.getSecond(), 
-                                                  new Pair<Pose3d, Boolean>(loc.getFirst(), false)));
+                                      .forEach(
+                                          loc -> {
+                                            map.put(
+                                                tagPose.getSecond().toString() + loc.getSecond(),
+                                                new Pair<Pose3d, Boolean>(loc.getFirst(), false));
+                                          });
                                 });
                       });
             });
@@ -131,17 +142,13 @@ public class ReefscapeScoring {
   public void score(String key) {
 
     scoringLocations.put(
-      key, 
-      new Pair<Pose3d, Boolean>(
-        scoringLocations.get(key).getFirst(),
-        true));
+        key, new Pair<Pose3d, Boolean>(scoringLocations.get(key).getFirst(), true));
   }
 
   public List<Pose3d> getCoral() {
 
     var scatteredCoral =
-        scoringLocations.values()
-            .stream()
+        scoringLocations.values().stream()
             .filter(Pair::getSecond) // filter for locs with coral
             .map(Pair::getFirst) // get their poses
             .toList(); // collect

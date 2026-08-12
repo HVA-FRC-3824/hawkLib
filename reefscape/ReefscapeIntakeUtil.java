@@ -33,13 +33,13 @@ public class ReefscapeIntakeUtil {
   }
 
   public static boolean insideIntakeRange(Pose3d coralPositionInAir) {
-    var pose = RobotState.getPoseEst().toPose2d();
+    var pose = RobotState.getSimRealPose().toPose2d();
 
     Translation3d robotPositionOnField = new Translation3d(pose.getTranslation());
     Rotation3d robotOrientation = new Rotation3d(pose.getRotation());
     Translation3d intakePositionOnField =
         robotPositionOnField.plus(
-            new Translation3d(Inches.of(15.0), Inches.of(0.0), Inches.of(8.0))
+            new Translation3d(Inches.of(15.0), Inches.of(0.0), Inches.of(0.0))
                 .rotateBy(robotOrientation));
 
     Translation3d difference = coralPositionInAir.getTranslation().minus(intakePositionOnField);
