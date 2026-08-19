@@ -14,12 +14,20 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.units.measure.Distance;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.DoubleStream;
+
 import org.photonvision.simulation.PhotonCameraSim;
 
 public interface PoseCameraIO {
@@ -47,7 +55,6 @@ public interface PoseCameraIO {
 
     // Pose present. Start running Heuristic
     var estStdDevs = Configs.Vision.kSingleTagStdDevs;
-    double avgDist = 0;
 
     if (targets.length == 0) {
       // No tags visible. Default to single-tag std devs
@@ -55,23 +62,20 @@ public interface PoseCameraIO {
     }
 
     // Precalculation - see how many tags we found, and calculate an average-distance metric
-    for (var tgt : targets) {
-      var tagPose = PoseCameraIO.getTagPose(tgt);
-      if (tagPose.equals(new Pose3d())) continue;
 
-      avgDist += tagPose.toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
-    }
-    avgDist /= targets.length;
-
-    // Decrease std devs if multiple targets are visible
-    if (targets.length > 1) estStdDevs = Configs.Vision.kMultiTagStdDevs;
+    Distance avgDist = Meters.of(Arrays.stream(targets)
+      .filter(tgt -> 1 <= tgt && tgt <= Constants.Vision.TagLayout.getTags().size() - 1)
+      .mapToDouble((tgt) -> 
+        PoseCameraIO.getTagPose(tgt).toPose2d().getTranslation().getDistance(estimatedPose.getTranslation())
+      ).sum() / targets.length);
+ 
     // Increase std devs based on (average) distance
     // max distance 15 meters
-    if (targets.length == 1 && avgDist > 15) {
+    if (targets.length == 1 && avgDist.gt(Meters.of(15))) {
       return VecBuilder.fill(
           Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     } else {
-      return estStdDevs.times(1 + (Math.pow(avgDist, 2) / 30));
+      return estStdDevs.times(1 + (Math.pow(avgDist.in(Meters), 2) / 30));
     }
   }
 }
