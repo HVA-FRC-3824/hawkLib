@@ -45,11 +45,6 @@ public class PoseVision extends SubsystemBase {
     }
   }
 
-  public void addGyroResetter(Consumer<Rotation3d> gyroResetter) {
-
-    for (PoseCameraIO camera : m_cameras) camera.addGyroResetter(gyroResetter);
-  }
-
   public void update() {
 
     update(null);

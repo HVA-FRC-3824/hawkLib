@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
@@ -39,8 +40,6 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
 
   private final VisionConfig m_config;
 
-  private Optional<Consumer<Rotation3d>> m_gyroResetter = Optional.empty();
-
   private List<Pose2d> m_lastSeenTags = List.of();
 
   public PoseCameraIOPhoton(VisionConfig config) {
@@ -49,11 +48,6 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
 
     m_camera = new PhotonCamera(m_config.name());
     estimator = new PhotonPoseEstimator(Constants.Vision.TagLayout, m_config.offset());
-  }
-
-  public void addGyroResetter(Consumer<Rotation3d> gyroResetter) {
-
-    m_gyroResetter = Optional.of(gyroResetter);
   }
 
   @Override
@@ -68,11 +62,7 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
 
                   // Use multiple tags to create a very accurate pose estimate
                   var est = estimator.estimateCoprocMultiTagPose(result);
-                  // Because we trust this estimate so much we can reset our rotation to it
-                  // Often, the gyro will drift significantly, this corrects it
-                  if (est.isPresent() && result.getBestTarget().poseAmbiguity < 0.5) {
-                    if (m_gyroResetter.isPresent())
-                      m_gyroResetter.get().accept(est.get().estimatedPose.getRotation());
+                  if (est.isPresent()) {
                     return est;
                   }
 

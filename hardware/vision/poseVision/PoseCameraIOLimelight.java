@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.o2026.RobotState;
 import frc.shared.hardware.vision.VisionConfig;
@@ -19,6 +20,8 @@ import frc.shared.hardware.vision.limelight.LimelightHelpers.PoseEstimate;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.Logger;
 
 public class PoseCameraIOLimelight implements PoseCameraIO {
@@ -26,6 +29,8 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
   private final VisionConfig m_config;
 
   private List<Pose2d> m_lastSeenTags;
+
+  private Consumer<Rotation3d> m_gyroResetter;
 
   public PoseCameraIOLimelight(VisionConfig config) {
 
@@ -70,6 +75,10 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
     Logger.recordOutput("Vision/" + m_config.name() + "/est", mt2.pose);
 
+    if (m_lastSeenTags.size() >= 2) {
+      m_gyroResetter.accept(mt2.pose.getRotation());
+    }
+
     var tagArr = tags.stream().mapToInt(x -> x).toArray();
     var measurements = new ArrayList<VisionData>(1);
     measurements.add(
@@ -80,6 +89,12 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
             tagArr));
 
     return measurements;
+  }
+  
+  @Override
+  public void addGyroResetter(Consumer<Rotation3d> gyroResetter) {
+
+    m_gyroResetter = gyroResetter;
   }
 
   @Override

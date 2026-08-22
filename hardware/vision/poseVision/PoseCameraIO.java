@@ -63,11 +63,13 @@ public interface PoseCameraIO {
 
     // Precalculation - see how many tags we found, and calculate an average-distance metric
 
-    Distance avgDist = Meters.of(Arrays.stream(targets)
-      .filter(tgt -> 1 <= tgt && tgt <= Constants.Vision.TagLayout.getTags().size() - 1)
-      .mapToDouble((tgt) -> 
-        PoseCameraIO.getTagPose(tgt).toPose2d().getTranslation().getDistance(estimatedPose.getTranslation())
-      ).sum() / targets.length);
+    Distance avgDist = Meters.of(
+      Arrays.stream(targets)
+        .filter(tgt -> 1 <= tgt && tgt <= Constants.Vision.TagLayout.getTags().size() - 1)
+        .mapToDouble((tgt) -> 
+          PoseCameraIO.getTagPose(tgt).toPose2d().getTranslation().getDistance(estimatedPose.getTranslation())
+        ).sum()
+        / targets.length);
  
     // Increase std devs based on (average) distance
     // max distance 15 meters
