@@ -11,17 +11,14 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import frc.o2026.RobotState;
 import frc.shared.hardware.vision.VisionConfig;
+import frc.shared.hardware.vision.VisionUtils;
 import frc.shared.hardware.vision.limelight.LimelightHelpers;
 import frc.shared.hardware.vision.limelight.LimelightHelpers.PoseEstimate;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.Logger;
 
 public class PoseCameraIOLimelight implements PoseCameraIO {
@@ -29,8 +26,6 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
   private final VisionConfig m_config;
 
   private List<Pose2d> m_lastSeenTags;
-
-  private Consumer<Rotation3d> m_gyroResetter;
 
   public PoseCameraIOLimelight(VisionConfig config) {
 
@@ -48,8 +43,7 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
         );
   }
 
-  @Override
-  public ArrayList<VisionData> getMeasurements() {
+  private ArrayList<VisionData> getMeasurements() {
 
     var rot = RobotState.getPoseEst().getRotation();
     LimelightHelpers.SetRobotOrientation(
@@ -69,15 +63,11 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
     var tags = List.of(mt2.rawFiducials).stream().mapToInt((tag) -> tag.id).boxed().toList();
 
-    m_lastSeenTags = tags.stream().map(PoseCameraIO::getTagPose).map(Pose3d::toPose2d).toList();
+    m_lastSeenTags = tags.stream().map(VisionUtils::getTagPose).map(Pose3d::toPose2d).toList();
 
     Logger.recordOutput("Vision/" + m_config.name() + "/lastMeasurement", mt2.timestampSeconds);
 
     Logger.recordOutput("Vision/" + m_config.name() + "/est", mt2.pose);
-
-    if (m_lastSeenTags.size() >= 2) {
-      m_gyroResetter.accept(mt2.pose.getRotation());
-    }
 
     var tagArr = tags.stream().mapToInt(x -> x).toArray();
     var measurements = new ArrayList<VisionData>(1);
@@ -85,27 +75,18 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
         new VisionData(
             new Pose3d(mt2.pose),
             mt2.timestampSeconds,
-            PoseCameraIO.getEstimationStdDevs(mt2.pose, tagArr),
+            VisionUtils.getEstimationStdDevs(mt2.pose, tagArr),
             tagArr));
 
     return measurements;
   }
-  
+    
   @Override
-  public void addGyroResetter(Consumer<Rotation3d> gyroResetter) {
+  public void updateInputs(PoseCameraInputs inputs) {
 
-    m_gyroResetter = gyroResetter;
-  }
-
-  @Override
-  public Transform3d getOffset() {
-
-    return m_config.offset();
-  }
-
-  @Override
-  public List<Pose2d> getLastSeenTags() {
-
-    return m_lastSeenTags;
+    inputs.offset = m_config.offset();
+    inputs.name = m_config.name();
+    inputs.lastSeenTags = m_lastSeenTags;
+    inputs.measurements = getMeasurements();
   }
 }

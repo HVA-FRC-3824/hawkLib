@@ -7,72 +7,50 @@
 package frc.shared.hardware.vision.poseVision;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.o2026.Constants;
-import frc.o2026.Robot;
+import frc.shared.hardware.vision.poseVision.PoseCameraIO.PoseCameraInputs;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.simulation.VisionSystemSim;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class PoseVision extends SubsystemBase {
-
-  private VisionSystemSim visionSim;
-
+  
   private Consumer<VisionData> m_poseEstimatorConsumer;
 
-  public List<PoseCameraIO> m_cameras;
+  public List<Pair<PoseCameraIO, PoseCameraInputs>> m_cameras;
 
   public PoseVision(Consumer<VisionData> poseEstimatorConsumer, PoseCameraIO... cameras) {
 
     m_poseEstimatorConsumer = poseEstimatorConsumer;
-    m_cameras = Arrays.asList(cameras);
 
-    if (Robot.isSimulation()) {
-      visionSim = new VisionSystemSim("main");
-      visionSim.addAprilTags(Constants.Vision.TagLayout);
-
-      for (PoseCameraIO m_camera : cameras)
-        visionSim.addCamera(m_camera.getSimCamera(), m_camera.getOffset());
-    }
-  }
-
-  public void update() {
-
-    update(null);
-  }
-
-  public void update(Pose2d simRealPos) {
-
-    if (simRealPos != null) visionSim.update(simRealPos);
-
-    for (PoseCameraIO camera : m_cameras) {
-      for (VisionData data : camera.getMeasurements()) {
-        m_poseEstimatorConsumer.accept(data);
-      }
-    }
+    // Totally not the most efficient way to do this
+    m_cameras = Arrays.asList(cameras)
+      .stream()
+      .map(camera -> new Pair<PoseCameraIO, PoseCameraInputs>(camera, new PoseCameraInputs()))
+      .toList();
   }
 
   @Override
   public void periodic() {
 
-    Logger.recordOutput(
-        "Vision/seenTargets",
-        m_cameras.stream()
-            .map(PoseCameraIO::getLastSeenTags)
-            .filter(poses -> poses != null)
-            .filter(poses -> !poses.isEmpty())
-            .flatMap(poses -> poses.stream())
-            .toList()
-            .toArray(Pose2d[]::new));
+    for (Pair<PoseCameraIO, PoseCameraInputs> camera : m_cameras) {
+
+      camera.getFirst().updateInputs(camera.getSecond());
+      Logger.processInputs(camera.getSecond().name, (LoggableInputs) camera.getSecond());
+
+      for (VisionData data : camera.getSecond().measurements) {
+        m_poseEstimatorConsumer.accept(data);
+      }
+    }
   }
 
   public record VisionData(

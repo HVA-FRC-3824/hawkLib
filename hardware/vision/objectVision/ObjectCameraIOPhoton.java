@@ -16,8 +16,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.shared.hardware.vision.VisionConfig;
-import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
@@ -43,65 +43,64 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
   }
 
   @Override
-  public Set<ObjectTargetData> getObjects() {
+  public void updateInputs(ObjectCameraInputs inputs) {
 
-    Set<ObjectTargetData> dataSet = new HashSet<>();
+    inputs.name = m_config.name();
+    inputs.objects = getObjects();
+    inputs.rotToBestObject = getRotToBestObject();
+  }
 
-    for (var result : m_camera.getAllUnreadResults()) {
-      for (var target : result.getTargets()) {
+  public List<ObjectTargetData> getObjects() {
 
-        // --- Range estimation using known geometry ---
-        // PhotonVision OD does NOT provide a reliable 3D translation in bestCameraToTarget.
-        // We instead compute range from the camera-height / target-pitch trig relationship,
-        // using the known height of the Fuel ball center above the floor.
+    return m_camera.getAllUnreadResults()
+      .stream()
+      .flatMap(result -> result.getTargets().stream())
+      .map(target -> {
 
-        double rangeMeters =
-            PhotonUtils.calculateDistanceToTargetMeters(
+        Distance distance =
+            Meters.of(
+              PhotonUtils.calculateDistanceToTargetMeters(
                 m_config.offset().getTranslation().getZ(),
                 m_targetHeight.in(Meters) / 2.0,
                 -m_config.offset().getRotation().getMeasureY().in(Radians),
-                Degrees.of(target.getPitch()).in(Radians));
+                Degrees.of(target.getPitch()).in(Radians)));
 
         Rotation2d yaw = Rotation2d.fromDegrees(target.getYaw());
 
         // Camera-relative (X forward, Y left). This is a pure flat-ground approximation —
         Translation3d cameraToTarget =
             new Translation3d(
-                rangeMeters * yaw.getCos(),
-                rangeMeters * yaw.getSin(),
-                (m_targetHeight.in(Meters) / 2.0) - m_config.offset().getTranslation().getZ());
+                distance.times(yaw.getCos()),
+                distance.times(yaw.getSin()),
+                m_targetHeight.div(2.0).minus(m_config.offset().getTranslation().getMeasureZ()));
 
         Translation3d robotToTarget =
             cameraToTarget
                 .rotateBy(m_config.offset().getRotation())
                 .plus(m_config.offset().getTranslation());
 
-        dataSet.add(new ObjectTargetData(target.objDetectId, target.objDetectConf, robotToTarget));
-      }
-    }
-
-    return dataSet;
+        return new ObjectTargetData(target.objDetectId, target.objDetectConf, robotToTarget);
+      })
+      .toList();
   }
 
-  @Override
   public Optional<Angle> getRotToBestObject() {
 
     var results = m_camera.getAllUnreadResults();
     if (results.size() == 0) return Optional.empty();
 
     PhotonPipelineResult objectResult = results.get(0);
-    if (objectResult != null) {
-      if (objectResult.hasTargets()) {
 
-        Logger.recordOutput("odYaw", objectResult.getBestTarget().getYaw());
-        return Optional.of(Degrees.of(objectResult.getBestTarget().getYaw()));
-      }
+    if (objectResult == null) {
+      return Optional.empty();
     }
 
-    return Optional.empty();
-  }
+    if (!objectResult.hasTargets()) {
+      return Optional.empty();
+    }
 
-  public Transform3d getRobotToCamera() {
-    return m_config.offset();
+    Logger.recordOutput("odYaw", objectResult.getBestTarget().getYaw());
+    return Optional.of(Degrees.of(objectResult.getBestTarget().getYaw()));
+
   }
 }

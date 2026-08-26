@@ -13,11 +13,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import frc.o2026.RobotState;
 import frc.shared.hardware.vision.VisionConfig;
-import frc.shared.hardware.vision.objectVision.ObjectVision.ObjectTargetData;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
@@ -38,7 +36,14 @@ public class ObjectCameraIOSim implements ObjectCameraIO {
   }
 
   @Override
-  public Set<ObjectTargetData> getObjects() {
+  public void updateInputs(ObjectCameraInputs inputs) {
+
+    inputs.name = m_config.name();
+    inputs.objects = getObjects();
+    inputs.rotToBestObject = getRotToBestObject();
+  }
+
+  public List<ObjectTargetData> getObjects() {
     Pose3d robotPose = RobotState.getSimRealPose();
 
     return m_arena.gamePiecesOnField().stream()
@@ -78,10 +83,9 @@ public class ObjectCameraIOSim implements ObjectCameraIO {
               return true;
             })
         .map(robotToTarget -> new ObjectTargetData(0, 1.0, robotToTarget))
-        .collect(Collectors.toSet());
+        .toList();
   }
 
-  @Override
   public Optional<Angle> getRotToBestObject() {
 
     Optional<ObjectTargetData> closestObject =

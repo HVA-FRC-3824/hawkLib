@@ -1,1 +1,1 @@
-# hawkLib
+# This is a library built by Jackson Case on team 3824, consisting of many core classes built for 2026. Also in here are some things made by other people. I believe I have their licenses and things in check. If not, I'll either remove them or fix the licensure issue. Either way tell me if so.

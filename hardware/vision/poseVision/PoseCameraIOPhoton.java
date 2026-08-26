@@ -11,21 +11,19 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;
 import frc.shared.hardware.vision.VisionConfig;
+import frc.shared.hardware.vision.VisionUtils;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -50,8 +48,7 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
     estimator = new PhotonPoseEstimator(Constants.Vision.TagLayout, m_config.offset());
   }
 
-  @Override
-  public ArrayList<VisionData> getMeasurements() {
+  private ArrayList<VisionData> getMeasurements() {
 
     return new ArrayList<VisionData>(
         m_camera.getAllUnreadResults().stream()
@@ -111,12 +108,12 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
 
                   // calculate the trust based on the distance of the tag(s) used
                   curStdDevs =
-                      PoseCameraIO.getEstimationStdDevs(est.estimatedPose.toPose2d(), targetArray);
+                      VisionUtils.getEstimationStdDevs(est.estimatedPose.toPose2d(), targetArray);
 
                   m_lastSeenTags =
                       est.targetsUsed.stream()
                           .map((target) -> target.fiducialId)
-                          .map(PoseCameraIO::getTagPose)
+                          .map(VisionUtils::getTagPose)
                           .map(Pose3d::toPose2d)
                           .toList();
 
@@ -126,12 +123,12 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
             .toList());
   }
 
-  public Transform3d getOffset() {
-    return m_config.offset();
-  }
+  @Override
+  public void updateInputs(PoseCameraInputs inputs) {
 
-  public List<Pose2d> getLastSeenTags() {
-
-    return m_lastSeenTags;
+    inputs.offset = m_config.offset();
+    inputs.name = m_config.name();
+    inputs.lastSeenTags = m_lastSeenTags;
+    inputs.measurements = getMeasurements();
   }
 }

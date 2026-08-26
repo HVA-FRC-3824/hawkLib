@@ -12,14 +12,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.o2026.RobotState;
+import frc.shared.hardware.vision.objectVision.ObjectCameraIO.ObjectCameraInputs;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class ObjectVision extends SubsystemBase {
 
   private ObjectCameraIO m_io;
+  private ObjectCameraInputs m_inputs = new ObjectCameraInputs();
 
   private List<Translation2d> m_fieldRelativeODTargets = List.of();
 
@@ -31,10 +35,11 @@ public class ObjectVision extends SubsystemBase {
   @Override
   public void periodic() {
 
-    var objects = m_io.getObjects();
+    m_io.updateInputs(m_inputs);
+    Logger.processInputs(m_inputs.name, (LoggableInputs) m_inputs);
 
     m_fieldRelativeODTargets =
-        objects.stream()
+        m_inputs.objects.stream()
             .map(
                 object ->
                     object
@@ -77,10 +82,6 @@ public class ObjectVision extends SubsystemBase {
 
   public boolean hasObjects() {
 
-    return !m_io.getObjects().isEmpty();
+    return !m_inputs.objects.isEmpty();
   }
-
-  // Transform is the transform from the robot center, using robot relative coordinates
-  public static record ObjectTargetData(
-      int objectId, double confidence, Translation3d translation) {}
 }

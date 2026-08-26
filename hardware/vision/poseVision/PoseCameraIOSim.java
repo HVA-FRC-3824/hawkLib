@@ -24,7 +24,11 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
   private double m_fov = 70;
   private double m_fps = 15;
 
-  private VisionSystemSim m_visionSim;
+  
+  private static VisionSystemSim VISION_SIM = new VisionSystemSim("main");
+  static {
+    VISION_SIM.addAprilTags(Constants.Vision.TagLayout);
+  }
 
   private PhotonCameraSim m_simCamera;
 
@@ -52,6 +56,6 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
   @Override
   public void periodic() {
 
-    m_visionSim.update(RobotState.getSimRealPose());
+    VISION_SIM.update(RobotState.getSimRealPose());
   }
 }

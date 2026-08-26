@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.shared.Quadruple;
+import frc.shared.hardware.vision.VisionUtils;
 import frc.shared.hardware.vision.poseVision.PoseCameraIO;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +65,7 @@ public class ReefscapeScoring {
               reefTag
                   .map(
                       tag ->
-                          new Pair<Pose2d, Integer>(PoseCameraIO.getTagPose(tag).toPose2d(), tag))
+                          new Pair<Pose2d, Integer>(VisionUtils.getTagPose(tag).toPose2d(), tag))
                   .forEach(
                       (tagPose) -> {
                         List.of(
