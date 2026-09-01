@@ -6,6 +6,8 @@
 
 package frc.shared.hardware.vision.objectVision;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -39,57 +41,59 @@ public class ObjectCameraIOSim implements ObjectCameraIO {
   public void updateInputs(ObjectCameraInputs inputs) {
 
     inputs.name = m_config.name();
-    inputs.objects = getObjects();
-    inputs.rotToBestObject = getRotToBestObject();
-  }
 
-  public List<ObjectTargetData> getObjects() {
     Pose3d robotPose = RobotState.getSimRealPose();
+    inputs.objects =
+        m_arena.gamePiecesOnField().stream()
+            .map(GamePieceOnFieldSimulation::getPose3d)
+            .map(Pose3d::getTranslation)
+            .map(
+                translation -> {
+                  // translation is field-relative. Convert to robot-relative:
+                  Translation2d robotRelative2d =
+                      translation
+                          .toTranslation2d()
+                          .minus(robotPose.getTranslation().toTranslation2d())
+                          .rotateBy(robotPose.getRotation().toRotation2d().unaryMinus());
+                  double relativeZ = translation.getZ() - robotPose.getZ();
+                  return new Translation3d(
+                      robotRelative2d.getX(), robotRelative2d.getY(), relativeZ);
+                })
+            .filter(
+                robotToTarget -> {
+                  // Convert robot-relative target position to camera-relative:
+                  Translation3d cameraToTarget =
+                      robotToTarget
+                          .minus(m_config.offset().getTranslation())
+                          .rotateBy(m_config.offset().getRotation().unaryMinus());
 
-    return m_arena.gamePiecesOnField().stream()
-        .map(GamePieceOnFieldSimulation::getPose3d)
-        .map(Pose3d::getTranslation)
-        .map(
-            translation -> {
-              // translation is field-relative. Convert to robot-relative:
-              Translation2d robotRelative2d =
-                  translation
-                      .toTranslation2d()
-                      .minus(robotPose.getTranslation().toTranslation2d())
-                      .rotateBy(robotPose.getRotation().toRotation2d().unaryMinus());
-              double relativeZ = translation.getZ() - robotPose.getZ();
-              return new Translation3d(robotRelative2d.getX(), robotRelative2d.getY(), relativeZ);
-            })
-        .filter(
-            robotToTarget -> {
-              // Convert robot-relative target position to camera-relative:
-              Translation3d cameraToTarget =
-                  robotToTarget
-                      .minus(m_config.offset().getTranslation())
-                      .rotateBy(m_config.offset().getRotation().unaryMinus());
+                  // Target is in front of camera (X > 0)
+                  if (cameraToTarget.getX() <= 0) return false;
 
-              // Target is in front of camera (X > 0)
-              if (cameraToTarget.getX() <= 0) return false;
+                  // Check horizontal FOV
+                  double horizontalAngle = Math.atan2(cameraToTarget.getY(), cameraToTarget.getX());
+                  if (Math.abs(horizontalAngle) > CAMERA_HORIZONTAL_FOV.getRadians() / 2.0)
+                    return false;
 
-              // Check horizontal FOV
-              double horizontalAngle = Math.atan2(cameraToTarget.getY(), cameraToTarget.getX());
-              if (Math.abs(horizontalAngle) > CAMERA_HORIZONTAL_FOV.getRadians() / 2.0)
-                return false;
+                  // Check vertical FOV
+                  double verticalAngle = Math.atan2(cameraToTarget.getZ(), cameraToTarget.getX());
+                  if (Math.abs(verticalAngle) > CAMERA_VERTICAL_FOV.getRadians() / 2.0)
+                    return false;
 
-              // Check vertical FOV
-              double verticalAngle = Math.atan2(cameraToTarget.getZ(), cameraToTarget.getX());
-              if (Math.abs(verticalAngle) > CAMERA_VERTICAL_FOV.getRadians() / 2.0) return false;
+                  return true;
+                })
+            .map(robotToTarget -> new ObjectTargetData(0, 1.0, robotToTarget))
+            .toArray(ObjectTargetData[]::new);
 
-              return true;
-            })
-        .map(robotToTarget -> new ObjectTargetData(0, 1.0, robotToTarget))
-        .toList();
+    var optRot = getRotToBestObject(inputs.objects);
+    inputs.rotToBestObject = optRot.orElse(Degrees.of(0));
+    inputs.hasRotToBestObject = optRot.isPresent();
   }
 
-  public Optional<Angle> getRotToBestObject() {
+  public Optional<Angle> getRotToBestObject(ObjectTargetData[] objects) {
 
     Optional<ObjectTargetData> closestObject =
-        getObjects().stream()
+        List.of(objects).stream()
             .min(
                 Comparator.comparingDouble(data -> data.translation().toTranslation2d().getNorm()));
 

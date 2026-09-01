@@ -1,8 +1,12 @@
+// Copyright (c) 2026-2027 FRC 3824 HVA RoHawktics
+// http://github.com/HVA-FRC-3824
+//
+// Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.shared.hardware.vision;
 
 import static edu.wpi.first.units.Units.Meters;
-
-import java.util.Arrays;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -13,10 +17,10 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
-import frc.shared.hardware.vision.poseVision.PoseCameraIO;
+import java.util.Arrays;
 
 public class VisionUtils {
-    public static Pose3d getTagPose(int fiduciary) {
+  public static Pose3d getTagPose(int fiduciary) {
 
     return Constants.Vision.TagLayout.getTagPose(fiduciary).orElse(new Pose3d());
   }

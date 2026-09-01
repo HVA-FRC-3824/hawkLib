@@ -11,19 +11,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.shared.hardware.vision.VisionConfig;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 public class ObjectCameraIOPhoton implements ObjectCameraIO {
 
@@ -45,62 +37,54 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
   @Override
   public void updateInputs(ObjectCameraInputs inputs) {
 
-    inputs.name = m_config.name();
-    inputs.objects = getObjects();
-    inputs.rotToBestObject = getRotToBestObject();
-  }
-
-  public List<ObjectTargetData> getObjects() {
-
-    return m_camera.getAllUnreadResults()
-      .stream()
-      .flatMap(result -> result.getTargets().stream())
-      .map(target -> {
-
-        Distance distance =
-            Meters.of(
-              PhotonUtils.calculateDistanceToTargetMeters(
-                m_config.offset().getTranslation().getZ(),
-                m_targetHeight.in(Meters) / 2.0,
-                -m_config.offset().getRotation().getMeasureY().in(Radians),
-                Degrees.of(target.getPitch()).in(Radians)));
-
-        Rotation2d yaw = Rotation2d.fromDegrees(target.getYaw());
-
-        // Camera-relative (X forward, Y left). This is a pure flat-ground approximation —
-        Translation3d cameraToTarget =
-            new Translation3d(
-                distance.times(yaw.getCos()),
-                distance.times(yaw.getSin()),
-                m_targetHeight.div(2.0).minus(m_config.offset().getTranslation().getMeasureZ()));
-
-        Translation3d robotToTarget =
-            cameraToTarget
-                .rotateBy(m_config.offset().getRotation())
-                .plus(m_config.offset().getTranslation());
-
-        return new ObjectTargetData(target.objDetectId, target.objDetectConf, robotToTarget);
-      })
-      .toList();
-  }
-
-  public Optional<Angle> getRotToBestObject() {
-
     var results = m_camera.getAllUnreadResults();
-    if (results.size() == 0) return Optional.empty();
 
-    PhotonPipelineResult objectResult = results.get(0);
+    inputs.name = m_config.name();
+    inputs.objects =
+        results.stream()
+            .flatMap(result -> result.getTargets().stream())
+            .map(
+                target -> {
+                  Distance distance =
+                      Meters.of(
+                          PhotonUtils.calculateDistanceToTargetMeters(
+                              m_config.offset().getTranslation().getZ(),
+                              m_targetHeight.in(Meters) / 2.0,
+                              -m_config.offset().getRotation().getMeasureY().in(Radians),
+                              Degrees.of(target.getPitch()).in(Radians)));
 
-    if (objectResult == null) {
-      return Optional.empty();
+                  Rotation2d yaw = Rotation2d.fromDegrees(target.getYaw());
+
+                  // Camera-relative (X forward, Y left). This is a pure flat-ground approximation —
+                  Translation3d cameraToTarget =
+                      new Translation3d(
+                          distance.times(yaw.getCos()),
+                          distance.times(yaw.getSin()),
+                          m_targetHeight
+                              .div(2.0)
+                              .minus(m_config.offset().getTranslation().getMeasureZ()));
+
+                  Translation3d robotToTarget =
+                      cameraToTarget
+                          .rotateBy(m_config.offset().getRotation())
+                          .plus(m_config.offset().getTranslation());
+
+                  return new ObjectTargetData(
+                      target.objDetectId, target.objDetectConf, robotToTarget);
+                })
+            .toArray(ObjectTargetData[]::new);
+
+    var rot = results.get(0);
+
+    if (rot == null) {
+      inputs.hasRotToBestObject = false;
+
+    } else if (!rot.hasTargets()) {
+      inputs.hasRotToBestObject = false;
+
+    } else {
+      inputs.rotToBestObject = Degrees.of(rot.getBestTarget().getYaw());
+      inputs.hasRotToBestObject = true;
     }
-
-    if (!objectResult.hasTargets()) {
-      return Optional.empty();
-    }
-
-    Logger.recordOutput("odYaw", objectResult.getBestTarget().getYaw());
-    return Optional.of(Degrees.of(objectResult.getBestTarget().getYaw()));
-
   }
 }

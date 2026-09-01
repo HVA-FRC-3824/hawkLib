@@ -9,9 +9,6 @@ package frc.shared.hardware.vision.poseVision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.littletonrobotics.junction.AutoLog;
 import org.photonvision.simulation.PhotonCameraSim;
 
@@ -22,14 +19,15 @@ public interface PoseCameraIO {
 
     public Transform3d offset = new Transform3d();
     public String name = "";
-    public ArrayList<VisionData> measurements = new ArrayList<>();
-    public List<Pose2d> lastSeenTags = new ArrayList<>();
+    public VisionData[] measurements = new VisionData[0];
+    public Pose2d[] lastSeenTags = new Pose2d[0];
   }
 
   public default void updateInputs(PoseCameraInputs inputs) {}
 
-  public default PhotonCameraSim getSimCamera() { return null; }
+  public default PhotonCameraSim getSimCamera() {
+    return null;
+  }
 
   public default void periodic() {}
-
 }

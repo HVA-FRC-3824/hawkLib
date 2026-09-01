@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.Timer;
@@ -22,7 +21,6 @@ import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.VisionUtils;
 import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
@@ -38,7 +36,7 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
 
   private final VisionConfig m_config;
 
-  private List<Pose2d> m_lastSeenTags = List.of();
+  private Pose2d[] m_lastSeenTags = new Pose2d[0];
 
   public PoseCameraIOPhoton(VisionConfig config) {
 
@@ -115,7 +113,7 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
                           .map((target) -> target.fiducialId)
                           .map(VisionUtils::getTagPose)
                           .map(Pose3d::toPose2d)
-                          .toList();
+                          .toArray(Pose2d[]::new);
 
                   return new VisionData(
                       est.estimatedPose, est.timestampSeconds, curStdDevs, targetArray);
@@ -129,6 +127,6 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
     inputs.offset = m_config.offset();
     inputs.name = m_config.name();
     inputs.lastSeenTags = m_lastSeenTags;
-    inputs.measurements = getMeasurements();
+    inputs.measurements = getMeasurements().toArray(VisionData[]::new);
   }
 }

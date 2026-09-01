@@ -15,7 +15,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.shared.hardware.vision.poseVision.PoseCameraIO.PoseCameraInputs;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class PoseVision extends SubsystemBase {
-  
+
   private Consumer<VisionData> m_poseEstimatorConsumer;
 
   public List<Pair<PoseCameraIO, PoseCameraInputs>> m_cameras;
@@ -33,10 +32,10 @@ public class PoseVision extends SubsystemBase {
     m_poseEstimatorConsumer = poseEstimatorConsumer;
 
     // Totally not the most efficient way to do this
-    m_cameras = Arrays.asList(cameras)
-      .stream()
-      .map(camera -> new Pair<PoseCameraIO, PoseCameraInputs>(camera, new PoseCameraInputs()))
-      .toList();
+    m_cameras =
+        Arrays.asList(cameras).stream()
+            .map(camera -> new Pair<PoseCameraIO, PoseCameraInputs>(camera, new PoseCameraInputs()))
+            .toList();
   }
 
   @Override

@@ -24,8 +24,8 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
   private double m_fov = 70;
   private double m_fps = 15;
 
-  
   private static VisionSystemSim VISION_SIM = new VisionSystemSim("main");
+
   static {
     VISION_SIM.addAprilTags(Constants.Vision.TagLayout);
   }

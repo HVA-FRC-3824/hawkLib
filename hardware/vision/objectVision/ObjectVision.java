@@ -9,11 +9,9 @@ package frc.shared.hardware.vision.objectVision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.o2026.RobotState;
 import frc.shared.hardware.vision.objectVision.ObjectCameraIO.ObjectCameraInputs;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +37,7 @@ public class ObjectVision extends SubsystemBase {
     Logger.processInputs(m_inputs.name, (LoggableInputs) m_inputs);
 
     m_fieldRelativeODTargets =
-        m_inputs.objects.stream()
+        List.of(m_inputs.objects).stream()
             .map(
                 object ->
                     object
@@ -82,6 +80,6 @@ public class ObjectVision extends SubsystemBase {
 
   public boolean hasObjects() {
 
-    return !m_inputs.objects.isEmpty();
+    return m_inputs.objects.length > 0;
   }
 }

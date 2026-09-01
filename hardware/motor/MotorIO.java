@@ -22,13 +22,23 @@ import org.littletonrobotics.junction.AutoLog;
 public interface MotorIO {
 
   public default void periodic() {}
+
   public default void config(MotorConfig config) {}
-  public default int getId() { return 0; }
+
+  public default int getId() {
+    return 0;
+  }
+
   public default void follow(int id, boolean inverted) {}
+
   public default void brake() {}
+
   public default void setPosition(Angle angle) {}
+
   public default void setVelocity(AngularVelocity angleVel) {}
+
   public default void setVoltage(Voltage volts) {}
+
   public default void resetEncoder(Angle angle) {}
 
   @AutoLog
@@ -42,6 +52,6 @@ public interface MotorIO {
     public Temperature temperature = Celsius.of(0.0);
     public double lastReference = 0.0;
   }
-  
+
   public default void updateInputs(MotorInputs inputs) {}
 }

@@ -25,7 +25,7 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
   private final VisionConfig m_config;
 
-  private List<Pose2d> m_lastSeenTags;
+  private Pose2d[] m_lastSeenTags = new Pose2d[0];
 
   public PoseCameraIOLimelight(VisionConfig config) {
 
@@ -63,7 +63,8 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
     var tags = List.of(mt2.rawFiducials).stream().mapToInt((tag) -> tag.id).boxed().toList();
 
-    m_lastSeenTags = tags.stream().map(VisionUtils::getTagPose).map(Pose3d::toPose2d).toList();
+    m_lastSeenTags =
+        tags.stream().map(VisionUtils::getTagPose).map(Pose3d::toPose2d).toArray(Pose2d[]::new);
 
     Logger.recordOutput("Vision/" + m_config.name() + "/lastMeasurement", mt2.timestampSeconds);
 
@@ -80,13 +81,13 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
     return measurements;
   }
-    
+
   @Override
   public void updateInputs(PoseCameraInputs inputs) {
 
     inputs.offset = m_config.offset();
     inputs.name = m_config.name();
     inputs.lastSeenTags = m_lastSeenTags;
-    inputs.measurements = getMeasurements();
+    inputs.measurements = getMeasurements().toArray(VisionData[]::new);
   }
 }

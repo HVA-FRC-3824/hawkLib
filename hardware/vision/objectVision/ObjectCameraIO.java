@@ -6,22 +6,20 @@
 
 package frc.shared.hardware.vision.objectVision;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.units.measure.Angle;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ObjectCameraIO {
 
   @AutoLog
   public static class ObjectCameraInputs {
-    
+
     public String name = "";
-    public Optional<Angle> rotToBestObject = Optional.empty();
-    public List<ObjectTargetData> objects = new ArrayList<>();
+    public Angle rotToBestObject = Degrees.of(0);
+    public boolean hasRotToBestObject = false;
+    public ObjectTargetData[] objects = new ObjectTargetData[0];
   }
 
   public default void updateInputs(ObjectCameraInputs inputs) {}
