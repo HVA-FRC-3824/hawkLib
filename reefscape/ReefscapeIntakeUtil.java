@@ -23,7 +23,9 @@ public class ReefscapeIntakeUtil {
   public static boolean hasNewCoralFromCollector(SimulatedArena arena) {
     // find all corals
     List<GamePieceOnFieldSimulation> corals = new ArrayList<>();
-    for (GamePieceOnFieldSimulation coral : arena.gamePiecesOnField()) corals.add(coral);
+    arena.gamePiecesOnField()
+      .stream()
+      .forEach(coral -> corals.add(coral));
 
     // choose those close enough to intake
     for (GamePieceOnFieldSimulation coral : corals)

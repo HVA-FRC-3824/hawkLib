@@ -32,21 +32,22 @@ public class SimBattery {
 
   public static void calculateSupplyVoltage() {
 
+    // Getting the Thristiest Boi like this is not the best way to do it, 
+    // but we wont be using this outside of testing.
     List<Pair<String, Current>> ampPairs =
         m_currents.entrySet().stream()
             .map(entry -> new Pair<String, Current>(entry.getKey(), entry.getValue().get()))
             .toList();
+            
     var ampStream = ampPairs.stream().mapToDouble(amp -> amp.getSecond().in(Amps)).distinct();
 
-    var maxOpt = ampStream.max();
-    if (maxOpt.isPresent()) {
-
-      for (var amp : ampPairs) {
-        if (maxOpt.getAsDouble() == amp.getSecond().in(Amps))
-          Logger.recordOutput("Thirstiest Boi", amp.getFirst());
-      }
-      ;
-    }
+    ampStream.max()
+      .ifPresent(max -> {
+        ampPairs
+          .stream()
+          .filter(amp -> max == amp.getSecond().in(Amps))
+          .forEach(amp -> Logger.recordOutput("Thirstiest Boi", amp.getFirst()));
+      });
 
     m_supplyVoltage = Volts.of(BatterySim.calculateDefaultBatteryLoadedVoltage());
   }

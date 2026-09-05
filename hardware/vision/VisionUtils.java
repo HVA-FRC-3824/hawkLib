@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Distance;
 import frc.o2026.Configs;
 import frc.o2026.Constants;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class VisionUtils {
   public static Pose3d getTagPose(int fiduciary) {
@@ -25,14 +26,13 @@ public class VisionUtils {
     return Constants.Vision.TagLayout.getTagPose(fiduciary).orElse(new Pose3d());
   }
 
-  public static Matrix<N4, N1> getEstimationStdDevs(Pose2d estimatedPose, int[] targets) {
+  public static Optional<Matrix<N4, N1>> getEstimationStdDevs(Pose2d estimatedPose, int[] targets) {
 
-    // Pose present. Start running Heuristic
     var estStdDevs = Configs.Vision.kSingleTagStdDevs;
 
-    if (targets.length == 0) {
-      // No tags visible. Default to single-tag std devs
-      return Configs.Vision.kSingleTagStdDevs;
+    // No tags visible. Default to single-tag std devs
+    if (targets.length == 0 || estimatedPose == null) {
+      return Optional.empty();
     }
 
     // Precalculation - see how many tags we found, and calculate an average-distance metric
@@ -51,13 +51,13 @@ public class VisionUtils {
                     .sum()
                 / targets.length);
 
-    // Increase std devs based on (average) distance
-    // max distance 15 meters
-    if (targets.length == 1 && avgDist.gt(Meters.of(15))) {
-      return VecBuilder.fill(
-          Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    
+    if (targets.length == 1 && avgDist.gt(Meters.of((Constants.Field.FieldLengthMeters * 3) / 5))) {
+      return Optional.empty();
     } else {
-      return estStdDevs.times(1 + (Math.pow(avgDist.in(Meters), 2) / 30));
+      // Increase std devs based on (average) distance
+      // max distance 15 meters
+      return Optional.of(estStdDevs.times(1 + (Math.pow(avgDist.in(Meters), 2) / 30)));
     }
   }
 }

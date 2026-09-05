@@ -25,34 +25,33 @@ public class PoseVision extends SubsystemBase {
 
   private Consumer<VisionData> m_poseEstimatorConsumer;
 
-  public List<Pair<PoseCameraIO, PoseCameraInputs>> m_cameras;
+  public List<Pair<PoseCameraIO, PoseCameraInputsAutoLogged>> m_cameras;
 
   public PoseVision(Consumer<VisionData> poseEstimatorConsumer, PoseCameraIO... cameras) {
 
     m_poseEstimatorConsumer = poseEstimatorConsumer;
 
-    // Totally not the most efficient way to do this
     m_cameras =
         Arrays.asList(cameras).stream()
-            .map(camera -> new Pair<PoseCameraIO, PoseCameraInputs>(camera, new PoseCameraInputs()))
+            .map(camera -> new Pair<PoseCameraIO, PoseCameraInputsAutoLogged>(camera, new PoseCameraInputsAutoLogged()))
             .toList();
   }
 
   @Override
   public void periodic() {
 
-    for (Pair<PoseCameraIO, PoseCameraInputs> camera : m_cameras) {
+    m_cameras
+      .stream()
+      .flatMap(camera -> {
+        camera.getFirst().updateInputs(camera.getSecond());
+        Logger.processInputs(camera.getSecond().name, camera.getSecond());
 
-      camera.getFirst().updateInputs(camera.getSecond());
-      Logger.processInputs(camera.getSecond().name, (LoggableInputs) camera.getSecond());
-
-      for (VisionData data : camera.getSecond().measurements) {
-        m_poseEstimatorConsumer.accept(data);
-      }
-    }
+        return Arrays.asList(camera.getSecond().measurements).stream();
+      })
+      .forEach(data -> m_poseEstimatorConsumer.accept(data));
   }
 
-  public record VisionData(
+  public static record VisionData(
       Pose3d visionMeasurement, double timestampSeconds, Matrix<N4, N1> stdDevs, int[] target) {
 
     public Matrix<N3, N1> get2dStdDevs() {

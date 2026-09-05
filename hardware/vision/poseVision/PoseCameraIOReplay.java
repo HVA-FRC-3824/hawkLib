@@ -8,6 +8,8 @@ package frc.shared.hardware.vision.poseVision;
 
 public record PoseCameraIOReplay(String name) implements PoseCameraIO {
 
+  // There are other ways of doing this. See how FRC 5000 Hammerheads did it.
+  // This is imo the simplest method in terms of usage, but is not 100% idomatic.
   public void updateInputs(PoseCameraInputs inputs) {
 
     inputs.name = name;

@@ -9,6 +9,7 @@ package frc.shared.hardware.vision.poseVision;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.o2026.RobotState;
@@ -76,7 +77,8 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
         new VisionData(
             new Pose3d(mt2.pose),
             mt2.timestampSeconds,
-            VisionUtils.getEstimationStdDevs(mt2.pose, tagArr),
+            VisionUtils.getEstimationStdDevs(mt2.pose, tagArr)
+                .orElse(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE)),
             tagArr));
 
     return measurements;

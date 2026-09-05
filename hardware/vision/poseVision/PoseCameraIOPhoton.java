@@ -9,6 +9,7 @@ package frc.shared.hardware.vision.poseVision;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
@@ -25,11 +26,11 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PoseCameraIOPhoton implements PoseCameraIO {
-
-  private Matrix<N4, N1> curStdDevs = Configs.Vision.kSingleTagStdDevs;
 
   protected PhotonCamera m_camera;
   private PhotonPoseEstimator estimator;
@@ -84,15 +85,6 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
                 })
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .filter(
-                est -> {
-                  return est.estimatedPose.getX() > 0
-                      && est.estimatedPose.getX() < Constants.Field.FieldLengthMeters
-                      && est.estimatedPose.getY() > 0
-                      && est.estimatedPose.getY() < Constants.Field.FieldWidthMeters
-                      && est.estimatedPose.getZ() > 0
-                      && est.estimatedPose.getZ() < 0.2;
-                })
             .map(
                 est -> {
                   var targets = est.targetsUsed.stream().mapToInt((target) -> target.fiducialId);
@@ -105,18 +97,24 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
                   var targetArray = targets.toArray();
 
                   // calculate the trust based on the distance of the tag(s) used
-                  curStdDevs =
-                      VisionUtils.getEstimationStdDevs(est.estimatedPose.toPose2d(), targetArray);
+                  var stdDevs =
+                      VisionUtils.getEstimationStdDevs(est.estimatedPose.toPose2d(), targetArray)
+                      .orElse(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+
+                  if (est.strategy != PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
+
+                    stdDevs.set(3, 0, Double.MAX_VALUE);
+                  }
 
                   m_lastSeenTags =
                       est.targetsUsed.stream()
-                          .map((target) -> target.fiducialId)
+                          .map(PhotonTrackedTarget::getFiducialId)
                           .map(VisionUtils::getTagPose)
                           .map(Pose3d::toPose2d)
                           .toArray(Pose2d[]::new);
 
                   return new VisionData(
-                      est.estimatedPose, est.timestampSeconds, curStdDevs, targetArray);
+                      est.estimatedPose, est.timestampSeconds, stdDevs, targetArray);
                 })
             .toList());
   }
