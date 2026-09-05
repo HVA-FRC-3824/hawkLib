@@ -9,6 +9,7 @@ package frc.shared;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+// This is 
 public class GuitarController {
 
   private CommandXboxController m_controller;
