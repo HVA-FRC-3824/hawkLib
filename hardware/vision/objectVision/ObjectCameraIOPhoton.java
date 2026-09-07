@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import frc.shared.hardware.vision.VisionConfig;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class ObjectCameraIOPhoton implements ObjectCameraIO {
 
@@ -74,17 +75,23 @@ public class ObjectCameraIOPhoton implements ObjectCameraIO {
                 })
             .toArray(ObjectTargetData[]::new);
 
-    var rot = results.get(0);
+    if (results.isEmpty()) {
+      inputs.hasRotToBestObject = false;
+      return;
+    }
 
+    PhotonPipelineResult rot = results.get(0);
     if (rot == null) {
       inputs.hasRotToBestObject = false;
-
-    } else if (!rot.hasTargets()) {
-      inputs.hasRotToBestObject = false;
-
-    } else {
-      inputs.rotToBestObject = Degrees.of(rot.getBestTarget().getYaw());
-      inputs.hasRotToBestObject = true;
+      return;
     }
+
+    if (!rot.hasTargets()) {
+      inputs.hasRotToBestObject = false;
+      return;
+    }
+
+    inputs.rotToBestObject = Degrees.of(rot.getBestTarget().getYaw());
+    inputs.hasRotToBestObject = true;
   }
 }

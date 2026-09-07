@@ -6,11 +6,17 @@
 
 package frc.shared.hardware.TOF;
 
+import org.littletonrobotics.junction.AutoLog;
+
 // Basic distance sensor
 public interface TOFIO {
 
-  public void config(TOFConfig config);
+  @AutoLog
+  public static class TOFIOInputs {
+    public boolean isDetected;
+  }
 
-  // TODO: CHANGE TO LoggedInputs PATTERN
-  public boolean isDetected();
+  public default void updateInputs(TOFIOInputs inputs) {}
+
+  public void config(TOFConfig config);
 }

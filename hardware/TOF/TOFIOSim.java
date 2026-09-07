@@ -20,8 +20,8 @@ public class TOFIOSim implements TOFIO {
   public void config(TOFConfig config) {}
 
   @Override
-  public boolean isDetected() {
+  public void updateInputs(TOFIOInputs inputs) {
 
-    return m_supplier.get();
+    inputs.isDetected = m_supplier.get();
   }
 }

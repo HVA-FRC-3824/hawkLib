@@ -2,26 +2,24 @@
 // http://github.com/HVA-FRC-3824
 //
 // Use of this source code is governed by an MIT-style license that can be found in the LICENSE file at
-// the root directory of this project.
+// the root directory of this project. Some code may be governed by other licenses which can be found in the "/External Licenses" directory.
 
 package frc.shared.rebuilt;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import frc.shared.rebuilt.firecontrol.FuelPhysicsSim;
-import frc.o2026.Constants;
+import frc.shared.external.firecontrol.FuelPhysicsSim;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class BallSim {
-    
+
   private FuelPhysicsSim ballSim;
 
   private static BallSim m_inst;
@@ -39,28 +37,30 @@ public class BallSim {
   // "getInstance" is guarunteed to have been called
   // that means that ballSim is guarunteed to be non-null
   public void defineRobot(
-    Distance robotWidth,
-    Distance robotLength,
-    Supplier<Pose2d> realSimPose,
-    Supplier<ChassisSpeeds> realSimSpeeds,
-    BooleanSupplier isIntaking,
-    Runnable incIntake
-  ) {
+      Distance robotWidth,
+      Distance robotLength,
+      Supplier<Pose2d> realSimPose,
+      Supplier<ChassisSpeeds> realSimSpeeds,
+      BooleanSupplier isIntaking,
+      Runnable incIntake) {
 
     BallSim.realSimSpeeds = realSimSpeeds;
 
     // tell it about your robot
     ballSim.configureRobot(
-      robotWidth.in(Meters), 
-      robotLength.in(Meters), 
-      Inches.of(4.5).in(Meters),
-      realSimPose, realSimSpeeds);
+        robotWidth.in(Meters),
+        robotLength.in(Meters),
+        Inches.of(4.5).in(Meters),
+        realSimPose,
+        realSimSpeeds);
 
-    ballSim.addIntakeZone(-0.85 / 2 - 0.2, -0.85 / 2, 
-      robotWidth.in(Meters) / -2, 
-      robotWidth.in(Meters) / 2, 
-      isIntaking, 
-      incIntake);
+    ballSim.addIntakeZone(
+        -0.85 / 2 - 0.2,
+        -0.85 / 2,
+        robotWidth.in(Meters) / -2,
+        robotWidth.in(Meters) / 2,
+        isIntaking,
+        incIntake);
   }
 
   public FuelPhysicsSim getPhysicsSim() {
@@ -72,9 +72,7 @@ public class BallSim {
     ballSim = new FuelPhysicsSim("Fuel");
 
     ballSim.enable();
-    ballSim.placeFieldBalls();  // spawns all the game pieces
-
-
+    ballSim.placeFieldBalls(); // spawns all the game pieces
   }
 
   public void update() {
@@ -83,10 +81,11 @@ public class BallSim {
   }
 
   public void launchAtRPM(Pose2d robotPose, double shooterRPM) {
-    
-    Translation3d launchPos = new Translation3d(robotPose.getX(), robotPose.getY(), Units.inchesToMeters(20.0));
 
-    double launchAngleRad = Math.toRadians(90-27);
+    Translation3d launchPos =
+        new Translation3d(robotPose.getX(), robotPose.getY(), Units.inchesToMeters(20.0));
+
+    double launchAngleRad = Math.toRadians(90 - 27);
     double exitSpeed = 1.0 * shooterRPM * Math.PI * Units.inchesToMeters(5.0) / 60.0;
     double vHorizontal = exitSpeed * Math.cos(launchAngleRad);
     double vVertical = exitSpeed * Math.sin(launchAngleRad);
@@ -97,7 +96,10 @@ public class BallSim {
     Translation3d launchVel = new Translation3d(vx, vy, vVertical);
 
     var speeds = realSimSpeeds.get();
-    launchVel = launchVel.plus(new Translation3d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond));
+    launchVel =
+        launchVel.plus(
+            new Translation3d(
+                speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond));
 
     ballSim.launchBall(launchPos, launchVel, 60.0);
   }

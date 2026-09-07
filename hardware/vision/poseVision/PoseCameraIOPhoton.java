@@ -8,19 +8,15 @@ package frc.shared.hardware.vision.poseVision;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.Timer;
-import frc.o2026.Configs;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;
+import frc.shared.Quadruple;
 import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.VisionUtils;
-import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
@@ -99,7 +95,12 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
                   // calculate the trust based on the distance of the tag(s) used
                   var stdDevs =
                       VisionUtils.getEstimationStdDevs(est.estimatedPose.toPose2d(), targetArray)
-                      .orElse(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+                          .orElse(
+                              VecBuilder.fill(
+                                  Double.MAX_VALUE,
+                                  Double.MAX_VALUE,
+                                  Double.MAX_VALUE,
+                                  Double.MAX_VALUE));
 
                   if (est.strategy != PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
 
@@ -114,7 +115,14 @@ public class PoseCameraIOPhoton implements PoseCameraIO {
                           .toArray(Pose2d[]::new);
 
                   return new VisionData(
-                      est.estimatedPose, est.timestampSeconds, stdDevs, targetArray);
+                      est.estimatedPose,
+                      est.timestampSeconds,
+                      new Quadruple<>(
+                          stdDevs.get(0, 0),
+                          stdDevs.get(1, 0),
+                          stdDevs.get(2, 0),
+                          stdDevs.get(3, 0)),
+                      targetArray);
                 })
             .toList());
   }

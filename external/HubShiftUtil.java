@@ -1,4 +1,6 @@
-package frc.shared.rebuilt;
+package frc.shared.external;
+
+// I believe this code came from 190 Gompei and the Herd
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;

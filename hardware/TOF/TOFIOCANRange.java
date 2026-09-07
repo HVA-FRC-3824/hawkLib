@@ -40,10 +40,9 @@ public class TOFIOCANRange implements TOFIO {
                 .withMinSignalStrengthForValidMeasurement(config.getMinSignalStrength()));
   }
 
-  // TODO: CHANGE TO LoggedInputs PATTERN
   @Override
-  public boolean isDetected() {
+  public void updateInputs(TOFIOInputs inputs) {
 
-    return m_isDetected.getValue();
+    inputs.isDetected = m_isDetected.getValue();
   }
 }

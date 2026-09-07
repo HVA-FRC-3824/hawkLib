@@ -1,4 +1,4 @@
-package frc.shared.rebuilt.firecontrol;
+package frc.shared.external.firecontrol;
 
 /*
  * ShotLUT.java - Distance-keyed lookup table for shot parameters

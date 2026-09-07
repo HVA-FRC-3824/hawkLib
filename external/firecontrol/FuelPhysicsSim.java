@@ -1,4 +1,4 @@
-package frc.shared.rebuilt.firecontrol;
+package frc.shared.external.firecontrol;
 
 /*
  * FuelPhysicsSim.java - Full-field ball physics simulation for FRC 2026 REBUILT

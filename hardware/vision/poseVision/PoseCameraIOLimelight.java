@@ -13,11 +13,11 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.o2026.RobotState;
+import frc.shared.Quadruple;
 import frc.shared.hardware.vision.VisionConfig;
 import frc.shared.hardware.vision.VisionUtils;
 import frc.shared.hardware.vision.limelight.LimelightHelpers;
 import frc.shared.hardware.vision.limelight.LimelightHelpers.PoseEstimate;
-import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -73,12 +73,19 @@ public class PoseCameraIOLimelight implements PoseCameraIO {
 
     var tagArr = tags.stream().mapToInt(x -> x).toArray();
     var measurements = new ArrayList<VisionData>(1);
+
+    var stdDevs =
+        VisionUtils.getEstimationStdDevs(mt2.pose, tagArr)
+            .orElse(
+                VecBuilder.fill(
+                    Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+
     measurements.add(
         new VisionData(
             new Pose3d(mt2.pose),
             mt2.timestampSeconds,
-            VisionUtils.getEstimationStdDevs(mt2.pose, tagArr)
-                .orElse(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE)),
+            new Quadruple<>(
+                stdDevs.get(0, 0), stdDevs.get(1, 0), stdDevs.get(2, 0), stdDevs.get(3, 0)),
             tagArr));
 
     return measurements;

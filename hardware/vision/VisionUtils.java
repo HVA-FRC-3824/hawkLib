@@ -9,7 +9,6 @@ package frc.shared.hardware.vision;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
@@ -51,7 +50,6 @@ public class VisionUtils {
                     .sum()
                 / targets.length);
 
-    
     if (targets.length == 1 && avgDist.gt(Meters.of((Constants.Field.FieldLengthMeters * 3) / 5))) {
       return Optional.empty();
     } else {

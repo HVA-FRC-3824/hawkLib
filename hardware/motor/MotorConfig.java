@@ -19,38 +19,25 @@ import lombok.With;
 @With
 public class MotorConfig {
 
-  @Getter Current supplyCurrent;
-  @Getter Current statorCurrent;
-  @Getter boolean inverted;
-  @Getter boolean brakeMode;
-  @Getter boolean continuousWrap;
-  @Getter double P;
-  @Getter double I;
-  @Getter double D;
-  @Getter double S;
-  @Getter double V;
-  @Getter double A;
-  @Getter AngularVelocity velocityLimit;
-  @Getter AngularAcceleration accelerationLimit;
-  @Getter double sensorToMechanismRatio;
+  @Getter Current supplyCurrent = Amps.of(70.0);
+  @Getter Current statorCurrent = Amps.of(120.0);
+  @Getter boolean inverted = false;
+  @Getter boolean brakeMode = true;
+  @Getter boolean continuousWrap = false;
+  @Getter double P = 0.0;
+  @Getter double I = 0.0;
+  @Getter double D = 0.0;
+  @Getter double S = 0.0;
+  @Getter double V = 0.0;
+  @Getter double A = 0.0;
+  @Getter double G = 0.0;
+  @Getter AngularVelocity velocityLimit = RotationsPerSecond.of(600.0);
+  @Getter AngularAcceleration accelerationLimit = RotationsPerSecondPerSecond.of(6000.0);
+  @Getter double sensorToMechanismRatio = 1.0;
 
-  public MotorConfig() {
-    supplyCurrent = Amps.of(70.0);
-    statorCurrent = Amps.of(120.0);
-    inverted = false;
-    brakeMode = true;
-    continuousWrap = false;
-    P = 0.0;
-    I = 0.0;
-    D = 0.0;
-    S = 0.0;
-    V = 0.0;
-    A = 0.0;
-    velocityLimit = RotationsPerSecond.of(600.0);
-    accelerationLimit = RotationsPerSecondPerSecond.of(6000.0);
-    sensorToMechanismRatio = 1.0;
-  }
+  public MotorConfig() {}
 
+  // Needed for lombok @With
   public MotorConfig(
       Current supplyCurrent,
       Current statorCurrent,
@@ -63,6 +50,7 @@ public class MotorConfig {
       double S,
       double V,
       double A,
+      double G,
       AngularVelocity velocityLimit,
       AngularAcceleration accelerationLimit,
       double sensorToMechanismRatio) {
@@ -78,6 +66,7 @@ public class MotorConfig {
     this.S = S;
     this.V = V;
     this.A = A;
+    this.G = G;
     this.velocityLimit = velocityLimit;
     this.accelerationLimit = accelerationLimit;
     this.sensorToMechanismRatio = sensorToMechanismRatio;

@@ -6,9 +6,14 @@
 
 package frc.shared.hardware.vision.poseVision;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import frc.shared.hardware.vision.poseVision.PoseVision.VisionData;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import frc.shared.Quadruple;
 import org.littletonrobotics.junction.AutoLog;
 import org.photonvision.simulation.PhotonCameraSim;
 
@@ -21,6 +26,18 @@ public interface PoseCameraIO {
     public String name = "";
     public VisionData[] measurements = new VisionData[0];
     public Pose2d[] lastSeenTags = new Pose2d[0];
+  }
+
+  public static record VisionData(
+      Pose3d visionMeasurement,
+      double timestampSeconds,
+      Quadruple<Double, Double, Double, Double> stdDevs,
+      int[] target) {
+
+    public Matrix<N3, N1> get2dStdDevs() {
+
+      return VecBuilder.fill(stdDevs.getFirst(), stdDevs.getSecond(), stdDevs.getFourth());
+    }
   }
 
   public default void updateInputs(PoseCameraInputs inputs) {}

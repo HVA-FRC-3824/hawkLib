@@ -58,4 +58,10 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
 
     VISION_SIM.update(RobotState.getSimRealPose());
   }
+
+  @Override
+  public void updateInputs(PoseCameraInputs inputs) {
+
+    super.updateInputs(inputs);
+  }
 }

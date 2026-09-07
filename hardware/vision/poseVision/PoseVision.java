@@ -6,20 +6,13 @@
 
 package frc.shared.hardware.vision.poseVision;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.shared.hardware.vision.poseVision.PoseCameraIO.PoseCameraInputs;
+import frc.shared.hardware.vision.poseVision.PoseCameraIO.VisionData;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class PoseVision extends SubsystemBase {
 
@@ -33,30 +26,24 @@ public class PoseVision extends SubsystemBase {
 
     m_cameras =
         Arrays.asList(cameras).stream()
-            .map(camera -> new Pair<PoseCameraIO, PoseCameraInputsAutoLogged>(camera, new PoseCameraInputsAutoLogged()))
+            .map(
+                camera ->
+                    new Pair<PoseCameraIO, PoseCameraInputsAutoLogged>(
+                        camera, new PoseCameraInputsAutoLogged()))
             .toList();
   }
 
   @Override
   public void periodic() {
 
-    m_cameras
-      .stream()
-      .flatMap(camera -> {
-        camera.getFirst().updateInputs(camera.getSecond());
-        Logger.processInputs(camera.getSecond().name, camera.getSecond());
+    m_cameras.stream()
+        .flatMap(
+            camera -> {
+              camera.getFirst().updateInputs(camera.getSecond());
+              Logger.processInputs(camera.getSecond().name, camera.getSecond());
 
-        return Arrays.asList(camera.getSecond().measurements).stream();
-      })
-      .forEach(data -> m_poseEstimatorConsumer.accept(data));
-  }
-
-  public static record VisionData(
-      Pose3d visionMeasurement, double timestampSeconds, Matrix<N4, N1> stdDevs, int[] target) {
-
-    public Matrix<N3, N1> get2dStdDevs() {
-
-      return VecBuilder.fill(stdDevs().get(0, 0), stdDevs().get(1, 0), stdDevs().get(3, 0));
-    }
+              return Arrays.asList(camera.getSecond().measurements).stream();
+            })
+        .forEach(data -> m_poseEstimatorConsumer.accept(data));
   }
 }

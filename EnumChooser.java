@@ -8,7 +8,6 @@ package frc.shared;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -21,9 +20,8 @@ public class EnumChooser<E extends Enum<E>> {
     m_chooser = new SendableChooser<>();
     m_chooser.setDefaultOption(defaultOption.toString(), defaultOption);
 
-    Arrays.asList(defaultOption.getDeclaringClass().getEnumConstants())
-      .stream()
-      .forEach(value -> m_chooser.addOption(value.toString(), value));
+    Arrays.asList(defaultOption.getDeclaringClass().getEnumConstants()).stream()
+        .forEach(value -> m_chooser.addOption(value.toString(), value));
 
     SmartDashboard.putData(name, m_chooser);
   }

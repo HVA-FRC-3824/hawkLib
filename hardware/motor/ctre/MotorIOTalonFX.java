@@ -19,6 +19,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -93,6 +94,9 @@ public class MotorIOTalonFX implements MotorIO {
     talonConfig.Slot0.kS = config.getS();
     talonConfig.Slot0.kV = config.getV();
     talonConfig.Slot0.kA = config.getA();
+
+    talonConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    talonConfig.Slot0.kG = config.getG();
 
     talonConfig.MotionMagic.MotionMagicCruiseVelocity =
         config.getVelocityLimit().in(RotationsPerSecond);

@@ -1,4 +1,4 @@
-package frc.shared.rebuilt.firecontrol;
+package frc.shared.external.firecontrol;
 
 /*
  * ShotParameters.java - Shot parameters (RPM, angle, TOF) for one LUT entry

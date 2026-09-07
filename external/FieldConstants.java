@@ -1,4 +1,4 @@
-package frc.shared.rebuilt;
+package frc.shared.external;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;

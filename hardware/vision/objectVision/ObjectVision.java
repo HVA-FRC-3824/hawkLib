@@ -11,17 +11,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.o2026.RobotState;
-import frc.shared.hardware.vision.objectVision.ObjectCameraIO.ObjectCameraInputs;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class ObjectVision extends SubsystemBase {
 
   private ObjectCameraIO m_io;
-  private ObjectCameraInputs m_inputs = new ObjectCameraInputs();
+  private ObjectCameraInputsAutoLogged m_inputs = new ObjectCameraInputsAutoLogged();
 
   private List<Translation2d> m_fieldRelativeODTargets = List.of();
 
@@ -34,7 +32,7 @@ public class ObjectVision extends SubsystemBase {
   public void periodic() {
 
     m_io.updateInputs(m_inputs);
-    Logger.processInputs(m_inputs.name, (LoggableInputs) m_inputs);
+    Logger.processInputs(m_inputs.name, m_inputs);
 
     m_fieldRelativeODTargets =
         List.of(m_inputs.objects).stream()
