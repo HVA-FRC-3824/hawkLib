@@ -15,7 +15,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.shared.Quadruple;
 import org.littletonrobotics.junction.AutoLog;
-import org.photonvision.simulation.PhotonCameraSim;
 
 public interface PoseCameraIO {
 
@@ -41,10 +40,4 @@ public interface PoseCameraIO {
   }
 
   public default void updateInputs(PoseCameraInputs inputs) {}
-
-  public default PhotonCameraSim getSimCamera() {
-    return null;
-  }
-
-  public default void periodic() {}
 }

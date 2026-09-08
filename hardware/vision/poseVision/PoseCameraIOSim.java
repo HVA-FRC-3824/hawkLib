@@ -9,6 +9,7 @@ package frc.shared.hardware.vision.poseVision;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.o2026.Constants;
 import frc.o2026.RobotState;
+import frc.shared.Periodical;
 import frc.shared.hardware.vision.VisionConfig;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -28,6 +29,8 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
 
   static {
     VISION_SIM.addAprilTags(Constants.Vision.TagLayout);
+
+    Periodical.addPeriodic(1, () -> VISION_SIM.update(RobotState.getSimRealPose()));
   }
 
   private PhotonCameraSim m_simCamera;
@@ -45,18 +48,8 @@ public class PoseCameraIOSim extends PoseCameraIOPhoton {
 
     m_simCamera = new PhotonCameraSim(m_camera, cameraProp, Constants.Vision.TagLayout);
     m_simCamera.enableDrawWireframe(false);
-  }
 
-  @Override
-  public PhotonCameraSim getSimCamera() {
-
-    return m_simCamera;
-  }
-
-  @Override
-  public void periodic() {
-
-    VISION_SIM.update(RobotState.getSimRealPose());
+    VISION_SIM.addCamera(m_simCamera, config.offset());
   }
 
   @Override
